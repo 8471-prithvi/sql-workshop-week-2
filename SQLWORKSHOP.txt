@@ -1,0 +1,109 @@
+--product table
+create table Product(
+   id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  price DECIMAL NOT NULL
+);
+
+INSERT INTO Product (name, price) VALUES
+('Laptop', 999.99),
+('Smartphone', 699.99),
+('Headphones', 199.99),
+('Monitor', 299.99),
+('Keyboard', 49.99);
+
+
+--feedback table
+create table Feedback(
+	id SERIAL PRIMARY KEY,
+  product_id INT REFERENCES Product(id),
+  rating INT NOT NULL,
+  feedback_date DATE NOT NULL
+);
+
+INSERT INTO Feedback (product_id, rating, feedback_date) VALUES
+(1, 5, '2024-08-01'),
+(1, 4, '2024-08-02'),
+(2, 3, '2024-08-01'),
+(2, 5, '2024-08-03'),
+(3, 2, '2024-08-01'),
+(3, 4, '2024-08-02'),
+(4, 5, '2024-08-03'),
+(4, 3, '2024-08-01'),
+(5, 1, '2024-08-02'),
+(5, 2, '2024-08-03');
+
+--display queries
+select p.*, f.* from 
+Product p
+join Feedback f 
+ON p.id=f.product_id;
+
+
+--overall average rating
+select AVG(rating) as overall_avg_rating
+from Feedback
+
+--particular date average rating
+select AVG(rating) as pt_date_average_rating
+from Feedback
+WHERE feedback_date = '2024-08-01';  --give date in the form of 'yyyy-mm-dd'
+
+--particular date rating count
+select count(*) as pt_date_rating_count
+from Feedback
+WHERE feedback_date = '2024-08-03'; 
+
+
+--particular date highest rating
+
+select MAX(rating) as pt_date_highest_rating
+from Feedback
+WHERE feedback_date = '2024-08-02';
+
+
+--particular date lowest rating
+select MIN(rating) as pt_date_lowest_rating
+from feedback
+WHERE feedback_date ='2024-08-01';
+
+-- overall highest rating
+
+select MAX(rating) as overall_highest_rting
+from feedback;
+
+--overall lowest rating
+select MIN(rating) as overall_lowest_rating
+from feedback;
+
+
+
+--function for getting overall highest rating
+
+create or replace function ovall_hght_rating()
+	returns INTEGER as
+	
+
+$$
+	declare highest_rating integer;
+begin
+
+select MAX(rating) into highest_rating
+from feedback;
+return highest_rating;
+end;
+$$
+language 'plpgsql'
+	
+--calling the fn
+
+select ovall_hght_rating();
+
+-- no of rating between definite dates
+select count(*) as btw_two_dates
+	from feedback where feedback_date
+between  '2024-08-01' and '2024-08-03';
+
+
+----Thank you--------
+
